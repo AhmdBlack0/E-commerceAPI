@@ -53,6 +53,7 @@ const registerUser = async (req, res) => {
         email: req.body.email,
         password: password,
         username: req.body.username,
+        role: req.body.role
       });
 
       const token = await jwt.sign(
