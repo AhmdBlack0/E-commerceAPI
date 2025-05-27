@@ -111,8 +111,9 @@ const addToCart = async (req, res) => {
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const itemIndex = user.cart.findIndex(
-      (item) => item.productId.toString() === productId
+      (item) => item.productId && item.productId.toString() === productId
     );
+
 
     if (itemIndex > -1) {
       user.cart[itemIndex].quantity += quantity || 1;
