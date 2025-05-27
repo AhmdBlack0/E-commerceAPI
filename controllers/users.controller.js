@@ -108,6 +108,8 @@ const addToCart = async (req, res) => {
   const { productId, quantity } = req.body;
 
   try {
+    if (!productId) return res.status(400).json({ error: "Product ID is required" });
+
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -115,18 +117,20 @@ const addToCart = async (req, res) => {
       (item) => item.productId && item.productId.toString() === productId
     );
 
-
     if (itemIndex > -1) {
       user.cart[itemIndex].quantity += quantity || 1;
     } else {
-      user.cart.push({ productId: mongoose.Types.ObjectId(productId), quantity: quantity || 1 });
+      user.cart.push({
+        productId: new mongoose.Types.ObjectId(productId),
+        quantity: quantity || 1,
+      });
     }
 
     await user.save();
     res.status(200).json({ message: "Cart updated", cart: user.cart });
   } catch (err) {
     console.error("Error adding to cart:", err);
-    res.status(500).json({ error: err.message});
+    res.status(500).json({ error: err.message });
   }
 };
 
