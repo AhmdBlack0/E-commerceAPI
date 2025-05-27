@@ -117,7 +117,7 @@ const addToCart = async (req, res) => {
     if (itemIndex > -1) {
       user.cart[itemIndex].quantity += quantity || 1;
     } else {
-      user.cart.push({ productId, quantity: quantity || 1 });
+      user.cart.push({ productId: mongoose.Types.ObjectId(productId), quantity: quantity || 1 });
     }
 
     await user.save();
