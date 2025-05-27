@@ -148,16 +148,21 @@ const getCart = async (req, res) => {
   }
 };
 
+// Update Cart Item
 const updateCartItem = async (req, res) => {
   const { userId } = req.params;
   const { productId, quantity } = req.body;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ error: "Invalid product ID" });
+    }
+
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const item = user.cart.find(
-      (item) => item.productId.toString() === productId
+      (item) => item.productId && item.productId.toString() === productId
     );
 
     if (!item) return res.status(404).json({ error: "Product not in cart" });
@@ -171,54 +176,59 @@ const updateCartItem = async (req, res) => {
   }
 };
 
+// Remove from Cart
 const removeFromCart = async (req, res) => {
   const { userId, productId } = req.params;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ error: "Invalid product ID" });
+    }
+
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
     user.cart = user.cart.filter(
-      (item) => item.productId.toString() !== productId
+      (item) => item.productId && item.productId.toString() !== productId
     );
 
     await user.save();
-    res
-      .status(200)
-      .json({ message: "Item removed from cart", cart: user.cart });
+    res.status(200).json({ message: "Item removed from cart", cart: user.cart });
   } catch (err) {
     console.error("Error removing item from cart:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
-// watchList
+// Get WatchList
 const getWatchList = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const user = await User.findById(userId).populate(
-      "watchList.productId",
-      "-__v"
-    );
+    const user = await User.findById(userId).populate("watchList.productId", "-__v");
     if (!user) return res.status(404).json({ error: "User not found" });
 
     res.status(200).json(user.watchList);
   } catch (err) {
-    console.error("Error fetching cart:", err);
+    console.error("Error fetching watchList:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
+// Remove from WatchList
 const removeFromWatchList = async (req, res) => {
   const { userId, productId } = req.params;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ error: "Invalid product ID" });
+    }
+
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
     user.watchList = user.watchList.filter(
-      (item) => item.productId.toString() !== productId
+      (item) => item.productId && item.productId.toString() !== productId
     );
 
     await user.save();
@@ -232,26 +242,32 @@ const removeFromWatchList = async (req, res) => {
   }
 };
 
+// Add to WatchList
 const addWatchList = async (req, res) => {
   const { userId } = req.params;
   const { productId } = req.body;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ error: "Invalid product ID" });
+    }
+
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const itemIndex = user.watchList.findIndex(
-      (item) => item.productId.toString() === productId
+      (item) => item.productId && item.productId.toString() === productId
     );
 
     if (itemIndex > -1) {
-      res.status(400).json({ message: "Item already in watchList" });
+      return res.status(400).json({ message: "Item already in watchList" });
     } else {
-      user.watchList.push({ productId });
+      user.watchList.push({ productId: new mongoose.Types.ObjectId(productId) });
       await user.save();
-      res
-        .status(200)
-        .json({ message: "watchList updated", watchList: user.watchList });
+      res.status(200).json({
+        message: "watchList updated",
+        watchList: user.watchList,
+      });
     }
   } catch (err) {
     console.error("Error adding to watchList:", err);
