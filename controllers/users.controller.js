@@ -150,8 +150,8 @@ const getCart = async (req, res) => {
 
 // Update Cart Item
 const updateCartItem = async (req, res) => {
-  const { userId } = req.params;
-  const { productId, quantity } = req.body;
+  const { userId, productId } = req.params;
+  const { quantity } = req.body;
 
   try {
     if (!mongoose.Types.ObjectId.isValid(productId)) {
