@@ -124,7 +124,7 @@ const addToCart = async (req, res) => {
     res.status(200).json({ message: "Cart updated", cart: user.cart });
   } catch (err) {
     console.error("Error adding to cart:", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: err});
   }
 };
 
