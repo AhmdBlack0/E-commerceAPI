@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  title       String
+  price       Float
+  description String
+  imageUrl    String[]
+  category    String
+  stock       Int?
+  rating      Float?
+  isActive    Boolean  @default(true)
+  tags        String[]
+  discount    Float?
+  size        String[]
+  color       String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt()
+
+  cartItems      CartItem[]
+  watchListItems WatchListItem[]
+
+  @@map("products")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  token     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  cart      CartItem[]
+  watchList WatchListItem[]
+
+  @@map("users")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("cart_items")
+}
+
+model WatchListItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("watchlist_items")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
