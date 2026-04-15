@@ -1,4 +1,4 @@
-const { prisma } = require("../lib/connectDB");
+import { prisma } from "../lib/connectDB.js";
 
 const getProducts = async (req, res) => {
   try {
@@ -100,7 +100,7 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   getProducts,
   addProduct,
   getProduct,

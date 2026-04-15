@@ -1,13 +1,13 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const { connectDB } = require("./lib/connectDB");
-const productRoutes = require("./routes/products.route");
-const userRoutes = require("./routes/user.route");
+import express from "express";
+import cors from "cors";
+import "dotenv/config";
+import { connectDB } from "./lib/connectDB.js";
+import productRoutes from "./routes/products.route.js";
+import userRoutes from "./routes/user.route.js";
+
 const app = express();
 app.use(cors());
 app.use(express.json());
-dotenv.config();
 const PORT = process.env.PORT || 3000;
 
 // Test database connection before starting server

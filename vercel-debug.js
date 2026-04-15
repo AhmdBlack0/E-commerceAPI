@@ -1,7 +1,7 @@
+import { PrismaClient } from '@prisma/client';
+
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'SET' : 'NOT SET');
-
-const { PrismaClient } = require('@prisma/client');
 
 try {
   console.log('Attempting to create Prisma client...');

@@ -1,7 +1,6 @@
-const express = require("express");
-const router = express.Router();
-const verifyToken = require("../middlewares/verifyToken");
-const {
+import express from "express";
+import verifyToken from "../middlewares/verifyToken.js";
+import {
   getUsers,
   registerUser,
   login,
@@ -13,8 +12,10 @@ const {
   getWatchList,
   removeFromWatchList,
   addWatchList,
-} = require("../controllers/users.controller");
-const verifyAdmin = require("../middlewares/verifyAdmin");
+} from "../controllers/users.controller.js";
+import verifyAdmin from "../middlewares/verifyAdmin.js";
+
+const router = express.Router();
 
 // User routes
 router.route("/users").get(verifyToken, verifyAdmin, getUsers);
@@ -39,4 +40,4 @@ router
   .route("/users/:userId/watchList/:productId")
   .delete(verifyToken, removeFromWatchList);
 
-module.exports = router;
+export default router;
