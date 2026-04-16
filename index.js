@@ -4,6 +4,7 @@ import "dotenv/config";
 import { connectDB } from "./lib/connectDB.js";
 import productRoutes from "./routes/products.route.js";
 import userRoutes from "./routes/user.route.js";
+import paymentRoutes from "./routes/payment.route.js";
 
 const app = express();
 app.use(cors());
@@ -16,6 +17,7 @@ connectDB().then(() => {
   
   app.use("/api/products", productRoutes);
   app.use("/api/", userRoutes);
+  app.use("/api/payment", paymentRoutes);
 
   // for test
   app.get("/test", (req, res) => {

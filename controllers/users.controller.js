@@ -135,38 +135,43 @@ const addToCart = async (req, res) => {
   try {
     if (!productId) return res.status(400).json({ error: "Product ID is required" });
 
+    // Check user exists
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Check product exists before attempting to create the cart item
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (!product) return res.status(404).json({ error: "Product not found" });
 
     const existingCartItem = await prisma.cartItem.findUnique({
       where: {
         userId_productId: {
           userId,
-          productId
-        }
-      }
+          productId,
+        },
+      },
     });
 
     if (existingCartItem) {
-      const updatedCartItem = await prisma.cartItem.update({
+      await prisma.cartItem.update({
         where: { id: existingCartItem.id },
         data: {
-          quantity: existingCartItem.quantity + (quantity || 1)
-        }
+          quantity: existingCartItem.quantity + (quantity || 1),
+        },
       });
     } else {
       await prisma.cartItem.create({
         data: {
           userId,
           productId,
-          quantity: quantity || 1
-        }
+          quantity: quantity || 1,
+        },
       });
     }
 
     const cart = await prisma.cartItem.findMany({
       where: { userId },
-      include: { product: true }
+      include: { product: true },
     });
 
     res.status(200).json({ message: "Cart updated", cart });
